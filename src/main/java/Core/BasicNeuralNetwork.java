@@ -50,6 +50,23 @@ public class BasicNeuralNetwork {
         accMatrixDelta = new double[weightsCount];
         thresholdDelta = new double[neuronCount];
 
+        reset();
+    }
+
+    //reset the weights matrix and threshold
+    public void reset() {
+
+
+        for (int i = 0; i < neuronCount; i++) {
+            thresholds[i] = 0.5 - Math.random();
+            thresholdDelta[i]=0;
+        }
+
+        for (int i = 0; i < weightMatrix.length; i++) {
+            weightMatrix[i] = 0.5 - Math.random();
+            matrixDelta[i]=0;
+            accMatrixDelta[i]=0;
+        }
     }
 
     public double[] computeOutPuts(double input[]) {
