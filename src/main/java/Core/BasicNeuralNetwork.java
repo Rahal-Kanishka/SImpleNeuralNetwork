@@ -13,7 +13,16 @@ public class BasicNeuralNetwork {
     private double globalError;
     private double ooutputsOfLevels[];
     private double weightMatrix[];
-    private double errors[]; //errors from the last calculations
+    private double error[]; //errors from the last calculations
+    private double errorDelta[];
+    private int neuronCount; //Total number of neurons in the network
+    private int weightsCount; //Total number of weights in the network
+    private double accMatrixDelta[];   //accumulates matrix data for training
+    private double matrixDelta[];   //changes which should be applied to the weights matrix
+    private double accThresholdDelta[]; //accumulation of threshold deltas
+    private double thresholdDelta[];  //the thresold deltas
+    private double thresholds[];
+
 
     public BasicNeuralNetwork(int inputCount,
                               int hiddenCount,
@@ -27,6 +36,19 @@ public class BasicNeuralNetwork {
         this.learnRate = learnRate;
         this.momentun = momentum;
 
+        neuronCount = inputCount + outputCount + hiddenCount;               //calculating the required total number of neurons
+        weightsCount = (inputCount * hiddenCount) + (hiddenCount * outputCount);  //calculating the required total number of weights
+
+        ooutputsOfLevels = new double[neuronCount];
+        weightMatrix = new double[neuronCount];
+
+        matrixDelta = new double[weightsCount];
+        thresholds = new double[neuronCount];
+        errorDelta = new double[neuronCount];
+        error = new double[neuronCount];
+        accThresholdDelta = new double[neuronCount];
+        accMatrixDelta = new double[weightsCount];
+        thresholdDelta = new double[neuronCount];
 
     }
 
