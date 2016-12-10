@@ -59,13 +59,61 @@ public class BasicNeuralNetwork {
 
         for (int i = 0; i < neuronCount; i++) {
             thresholds[i] = 0.5 - Math.random();
-            thresholdDelta[i]=0;
+            thresholdDelta[i] = 0;
         }
 
         for (int i = 0; i < weightMatrix.length; i++) {
             weightMatrix[i] = 0.5 - Math.random();
-            matrixDelta[i]=0;
-            accMatrixDelta[i]=0;
+            matrixDelta[i] = 0;
+            accMatrixDelta[i] = 0;
+        }
+    }
+
+    //calculate the error
+
+    public void calculateError(double ideal[]) {
+        int i, j;
+        final int hiddenIndex = inputCount;
+        final int outputIndex = inputCount + hiddenCount;
+
+        // clear hidden layer errors
+        for (i = inputCount; i < neuronCount; i++) {
+            error[i] = 0;
+        }
+
+        // layer errors and deltas for output layer
+        for (i = outputIndex; i < neuronCount; i++) {
+            error[i] = ideal[i - outputIndex] - outputsOfLevels[i];
+            globalError += error[i] * error[i];
+            errorDelta[i] = error[i] * outputsOfLevels[i] * (1 - outputsOfLevels[i]);
+        }
+
+        // hidden layer errors
+        int winx = inputCount * hiddenCount;
+
+        for (i = outputIndex; i < neuronCount; i++) {
+            for (j = hiddenIndex; j < outputIndex; j++) {
+                accMatrixDelta[winx] += errorDelta[i] * outputsOfLevels[j];
+                error[j] += weightMatrix[winx] * errorDelta[i];
+                winx++;
+            }
+            accThresholdDelta[i] += errorDelta[i];
+        }
+
+        // hidden layer deltas
+        for (i = hiddenIndex; i < outputIndex; i++) {
+            errorDelta[i] = error[i] * outputsOfLevels[i] * (1 - outputsOfLevels[i]);
+        }
+
+        // input layer errors
+        winx = 0; // offset into weight array
+        for (i = hiddenIndex; i < outputIndex; i++) {
+            for (j = 0; j < hiddenIndex; j++) {
+                accMatrixDelta[winx] += errorDelta[i] * outputsOfLevels[j];
+                error[j] += weightMatrix[winx] * errorDelta[i];
+                winx++;
+            }
+            accThresholdDelta[i] += errorDelta[i];
         }
     }
 
