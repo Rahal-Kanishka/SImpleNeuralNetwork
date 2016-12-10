@@ -9,9 +9,9 @@ public class BasicNeuralNetwork {
     private int hiddenCount;
     private int outputCount;
     private double learnRate;
-    private double momentun;
+    private double momentum;
     private double globalError;
-    private double ooutputsOfLevels[];
+    private double outputsOfLevels[];
     private double weightMatrix[];
     private double error[]; //errors from the last calculations
     private double errorDelta[];
@@ -34,12 +34,12 @@ public class BasicNeuralNetwork {
         this.hiddenCount = hiddenCount;
         this.outputCount = outputCount;
         this.learnRate = learnRate;
-        this.momentun = momentum;
+        this.momentum = momentum;
 
         neuronCount = inputCount + outputCount + hiddenCount;               //calculating the required total number of neurons
         weightsCount = (inputCount * hiddenCount) + (hiddenCount * outputCount);  //calculating the required total number of weights
 
-        ooutputsOfLevels = new double[neuronCount];
+        outputsOfLevels = new double[neuronCount];
         weightMatrix = new double[neuronCount];
 
         matrixDelta = new double[weightsCount];
@@ -73,6 +73,24 @@ public class BasicNeuralNetwork {
         //input size should be equal to the number of inputs
 
         return input;
+    }
+
+    public void learn() {
+        int i;
+
+        // process the matrix
+        for (i = 0; i < weightMatrix.length; i++) {
+            matrixDelta[i] = (learnRate * accMatrixDelta[i]) + (momentum * matrixDelta[i]);
+            weightMatrix[i] += matrixDelta[i];
+            accMatrixDelta[i] = 0;
+        }
+
+        // process the thresholds
+        for (i = inputCount; i < neuronCount; i++) {
+            thresholdDelta[i] = learnRate * accThresholdDelta[i] + (momentum * thresholdDelta[i]);
+            thresholds[i] += thresholdDelta[i];
+            accThresholdDelta[i] = 0;
+        }
     }
 
     public void calcualteError(double ideal[]) {
@@ -117,10 +135,10 @@ public class BasicNeuralNetwork {
     }
 
     public double getMomentun() {
-        return momentun;
+        return momentum;
     }
 
     public void setMomentun(double momentun) {
-        this.momentun = momentun;
+        this.momentum = momentun;
     }
 }
