@@ -11,7 +11,7 @@ public class BasicNeuralNetwork {
     private double learnRate;
     private double momentum;
     private double globalError;
-    private double outputsOfLevels[];
+    private double outputsOfLevels[];   //instead for fire
     private double weightMatrix[];
     private double error[]; //errors from the last calculations
     private double errorDelta[];
@@ -117,10 +117,50 @@ public class BasicNeuralNetwork {
         }
     }
 
+    public double threshold(double sum) {
+        return 1.0 / (1 + Math.exp(-1.0 * sum));
+    }
+
+
     public double[] computeOutPuts(double input[]) {
         //input size should be equal to the number of inputs
+        int i, j;
+        final int hiddenIndex = inputCount;
+        final int outIndex = inputCount + hiddenCount;
 
-        return input;
+        for (i = 0; i < inputCount; i++) {
+            outputsOfLevels[i] = input[i];
+        }
+
+        // first layer
+        int inx = 0;
+
+        for (i = hiddenIndex; i < outIndex; i++) {
+            double sum = thresholds[i];
+
+            for (j = 0; j < inputCount; j++) {
+                sum += outputsOfLevels[j] * weightMatrix[inx++];
+            }
+            outputsOfLevels[i] = threshold(sum);
+        }
+
+        // hidden layer
+
+        double result[] = new double[outputCount];
+
+        for (i = outIndex; i < neuronCount; i++) {
+            double sum = thresholds[i];
+
+            for (j = hiddenIndex; j < outIndex; j++) {
+                sum += outputsOfLevels[j] * weightMatrix[inx++];
+            }
+            outputsOfLevels[i] = threshold(sum);
+            result[i - outIndex] = outputsOfLevels[i];
+        }
+
+        return result;
+
+
     }
 
     public void learn() {
@@ -141,13 +181,11 @@ public class BasicNeuralNetwork {
         }
     }
 
-    public void calcualteError(double ideal[]) {
-
-    }
 
     public double getError(int len) {
-
-        return 0.00;
+        double err = Math.sqrt(globalError / (len * outputCount));
+        globalError = 0; // clear the accumulator
+        return err;
     }
 
     public int getInputCount() {
